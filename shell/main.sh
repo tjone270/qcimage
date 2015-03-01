@@ -1,8 +1,14 @@
 #!/bin/bash
 
-. /qcimage/shell/git_functions.sh
-. /qcimage/shell/raw_imaging.sh
-. /qcimage/shell/settings.sh
+
+for file in $(find /qcimage/shell -name \*.sh); do
+    filename=$(basename $file)
+    if [ "$filename" == "main.sh" -o "${filename:0:1}" == "." ]; then
+	continue
+    fi
+    echo "Sourcing $file"
+    . $file
+done
 
 function qcimage_apply {
     repo_reset
@@ -25,6 +31,8 @@ function qcimage_reset {
     repo_reset
     boot_windows
 }
+
+qcimage_settings_main
 
 if [ $# = 1 ]; then
   # If we're being executed directly, run the right function
