@@ -16,10 +16,23 @@ function remove_windows_cruft {
     umount_windows
 }
 
+function find_msr {
+    sfdisk --dump $INTERNAL_DISK| awk -F: '/E3C9/ {print $1}'
+}
+
+function save_msr {
+    dd if=$(find_msr) of=/images/msr.img bs=8M
+}
+
+function restore_msr {
+    dd if=/images/msr.img of=$(find_msr) bs=8M
+}
+
 function save_windows {
   # This function makes new windows clone images
   save_mbr
   remove_windows_cruft
+  save_msr
   for part in $(find_ntfs_parts|grep $INTERNAL_DISK); do
       echo $part
       part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')

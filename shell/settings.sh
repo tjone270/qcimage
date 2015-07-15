@@ -4,7 +4,7 @@
 function qcimage_settings_main {
 
     # If we have to resize Windows, this is how large it should be␘
-    WINDOWS_PART_SIZE="32" # IN GB
+    WINDOWS_PART_SIZE="64" # IN GB
     
     DISKS=$(lsblk -o TYPE,NAME|awk '/disk/ {print $2}')
     ROOT_PART=$(mount|awk '/on \/ / {print $1}')
@@ -67,9 +67,9 @@ function find_internal_disk {
 }
 
 function find_admin_part {
-    # Find the first enumerated disk whose first partition is btrfs
+    # Find the first enumerated disk whose second partition is btrfs
     for disk in $DISKS; do
-	first_part_dev=/dev/${disk}1
+	first_part_dev=/dev/${disk}2
 	if [ "$(get_partition_fstype $first_part_dev)" == "btrfs" ]; then
 	    echo $first_part_dev
 	    break
