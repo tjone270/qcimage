@@ -1,9 +1,0 @@
-[Unit]
-Description=Apply player diff to local windows partition
-ConditionKernelCommandLine=apply
-
-[Service]
-ExecStart=/qcimage/shell/main.sh apply
-RemainAfterExit=yes
-TimeoutSec=0
-Type=oneshot

@@ -4,27 +4,19 @@
 ## (install on tourney local disk) is not the rootfs (e.g. booted from
 ## USB admin stick)
 
-function check_admin_linux {
-    calling_func=$1
-    if [ ! "$QCIMAGE_MODE" == "admin" ]; then
-	echo "$calling_func: Operation not valid in context $QCIMAGE_MODE"
-	return 1
-    fi
-    return 0
-}
+# function check_admin_linux {
+#     calling_func=$1
+#     if [ ! "$QCIMAGE_MODE" == "admin" ]; then
+# 	echo "$calling_func: Operation not valid in context $QCIMAGE_MODE"
+# 	return 1
+#     fi
+#     return 0
+# }
 
 function mount_client_linux {
-    if check_admin_linux "mount_client_linux"; then
-	return $?
-    fi
-    if [ ! "$(get_partition_fstype ${LOCAL_LINUX_PART})" == "btrfs" ]; then
-	echo "Found *unformated* local linux partition on $LOCAL_LINUX_PART, formatting" 
-	mkfs.btrfs ${LOCAL_LINUX_PART}	
-    fi
+    echo "Trying to mount internal linux"
     mount ${LOCAL_LINUX_PART} ${LOCAL_LINUX_DIR}
-    if [ ! -e ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR} ]; then
-	btrfs subvolume create ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR}
-    fi
+    mount $(find_internal_efi) ${LOCAL_LINUX_DIR}/boot
 }
 
 function umount_client_linux {
@@ -32,6 +24,7 @@ function umount_client_linux {
 	echo "Operation not valid in context $QCIMAGE_MODE: umount_client_linux"
 	return 1
     fi
+    umount ${LOCAL_LINUX_DIR}/boot
     umount ${LOCAL_LINUX_DIR}
 }
 

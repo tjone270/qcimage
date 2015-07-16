@@ -1,9 +1,0 @@
-[Unit]
-Description=Create player diff from local windows image state
-ConditionKernelCommandLine=diff
-
-[Service]
-ExecStart=/qcimage/shell/main.sh diff
-RemainAfterExit=yes
-TimeoutSec=0
-Type=oneshot

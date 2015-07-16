@@ -10,20 +10,8 @@ for file in $(find /qcimage/shell -name \*.sh); do
     . $file
 done
 
-function qcimage_apply {
-    repo_reset
-    apply_diff
-    boot_windows
-}
-
 function qcimage_reclone {
     clone_new_machine
-    boot_windows
-}
-
-function qcimage_diff {
-    init_player_key
-    generate_diff
     boot_windows
 }
 

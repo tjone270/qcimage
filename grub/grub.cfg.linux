@@ -1,0 +1,14 @@
+menuentry 'linux' {
+	load_video
+	set gfxpayload=keep
+	insmod gzio
+	insmod part_gpt 
+	insmod fat
+	set root='hd0,gpt1'
+	search --no-floppy --fs-uuid --set=root x_INTERNAL_EFI_UUID
+	echo	'Loading QCImage linux ...'
+	linux	/vmlinuz-linux root=UUID=x_INTERNAL_LINUX_UUID rw  quiet
+	echo	'Loading initial ramdisk ...'
+	initrd	 /initramfs-linux.img
+}
+

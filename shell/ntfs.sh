@@ -77,7 +77,7 @@ function resize_ntfs {
     fi
     disk=$(expr match "$part" '\([/a-z]*\)')
     part_num=$(expr match "$part" '[/a-z]*\([0-9]*\)')
-    ntfsresize -ffs ${WINDOWS_PART_SIZE}G $WINDOWS_PART
+    ntfsresize -ffs $(( $(get_ntfs_size) / 2 )) $WINDOWS_PART
     start=$(parted -s $disk unit B print |awk -vpart_num="$part_num" 'match($1, part_num) {print $2 }')
     start=${start:0: -1} # Strip trailing B
     echo "Partition starts at: $start"

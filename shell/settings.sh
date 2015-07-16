@@ -3,9 +3,6 @@
 
 function qcimage_settings_main {
 
-    # If we have to resize Windows, this is how large it should be␘
-    WINDOWS_PART_SIZE="64" # IN GB
-    
     DISKS=$(lsblk -o TYPE,NAME|awk '/disk/ {print $2}')
     ROOT_PART=$(mount|awk '/on \/ / {print $1}')
 
@@ -16,7 +13,8 @@ function qcimage_settings_main {
     WINDOWS_PART=$(find_windows_part)
     WINDOWS_DIR=/windows
     WINDOWS_SHIT=( pagefile.sys hiberfile.sys )
-    
+
+    LOCAL_LINUX_TEMPLATE=/images/internal_linux
     LOCAL_LINUX_PART=$(find_local_linux)
     LOCAL_LINUX_DIR=/client_linux
     
@@ -32,13 +30,13 @@ function qcimage_settings_main {
     
     # Where we host bsend files, must be on subvolume to avoid inclusion
     # in future milstone snaps
-    MILESTONE_SRV_DIR=$SNAPSHOT_DIR/milestone_srv
-    
+    #MILESTONE_SRV_DIR=$SNAPSHOT_DIR/milestone_srv
+    #
     RAW_IMAGE_DIR=/images
     
-    REPO_DIR=/repo
+    #REPO_DIR=/repo
     
-    SNAPSHOT_DIR=/snapshots
+    #SNAPSHOT_DIR=/snapshots
     
     # Rsync info for demo backup
     DEMOS_USER=
@@ -46,8 +44,10 @@ function qcimage_settings_main {
     DEMOS_SERVER=
     DEMOS_PATH=
 
-    export QCIMAGE_MODE INTERNAL_DISK RAW_IMAGE_DIR REPO_DIR WINDOWS_DIR SNAPSHOT_DIR
-    export DISKS WINDOWS_PART LOCAL_LINUX_PART LOCAL_LINUX_DIR ADMIN_LINUX_PART ROOT_PART ADMIN_LINUX_DIR
+    PATH=$PATH:/qcimage/shell
+    
+    export QCIMAGE_MODE INTERNAL_DISK RAW_IMAGE_DIR REPO_DIR WINDOWS_DIR SNAPSHOT_DIR LOCAL_LINUX_TEMPLATE
+    export DISKS WINDOWS_PART LOCAL_LINUX_PART LOCAL_LINUX_DIR ADMIN_LINUX_PART ROOT_PART ADMIN_LINUX_DIR PATH
 }
 
 function find_internal_disk {
@@ -99,7 +99,7 @@ function find_local_linux {
     if [ -n "$disk_dev" ]; then
 	disk_dev=$(find_internal_disk)
     fi
-    for part in $(find_linux_parts |grep $disk_dev); do
+    for part in $(find_linux_parts $disk_dev); do
 	echo $part
 	break
     done

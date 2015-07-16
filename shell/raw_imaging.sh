@@ -6,68 +6,68 @@ function restore_mbr {
     sfdisk $INTERNAL_DISK < /images/gpt.desc
 }
 
-function transfer_linux_to_client {
-    if [ ! "$QCIMAGE_MODE" == "admin" ]; then
-	echo "Operation not valid in context $QCIMAGE_MODE: transfer_linux_to_client"
-    fi
-    if client_linux_is_mounted_p; then
-	umount_client_linux
-    fi
-    mount_client_btrfs_root
-    # Delete old root subvol
-    if [ -e ${LOCAL_LINUX_DIR}/root ]; then
-	btrfs subvolume delete ${LOCAL_LINUX_DIR}/root
-    fi
-    ## Create a snapshot of admin linux root on admin linux
-    snap=$SNAPSHOT_DIR/$(get_newest_milestone /)
-    ## Send the snapshot to the local linux as /${snap}
-    parent=$(get_newest_snap ${LOCAL_LINUX_DIR})
-    if milestone_present_p parent /; then
-	btrfs send -p $parent $snap | btrfs receive ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR}
-    else
-	btrfs send $snap | btrfs receive ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR}
-    fi
-    ## Set this new local linux subvolume to be automatically mounted
-    btrfs subvolume snapshot ${LOCAL_LINUX_DIR}/${snap} ${LOCAL_LINUX_DIR}/root
-    set_btrfs_default_subvol_by_name ${LOCAL_LINUX_DIR} root
-    ## Remount client_linux to reflect new default subvolume / root
-    umount_client_linux
-    mount_client_linux
-    genfstab -U ${LOCAL_LINUX_DIR} > ${LOCAL_LINUX_DIR}/etc/fstab
-    modify_local_linux
-    configure_local_grub
-}
+# function transfer_linux_to_client {
+#     if [ ! "$QCIMAGE_MODE" == "admin" ]; then
+# 	echo "Operation not valid in context $QCIMAGE_MODE: transfer_linux_to_client"
+#     fi
+#     if client_linux_is_mounted_p; then
+# 	umount_client_linux
+#     fi
+#     mount_client_btrfs_root
+#     # Delete old root subvol
+#     if [ -e ${LOCAL_LINUX_DIR}/root ]; then
+# 	btrfs subvolume delete ${LOCAL_LINUX_DIR}/root
+#     fi
+#     ## Create a snapshot of admin linux root on admin linux
+#     snap=$SNAPSHOT_DIR/$(get_newest_milestone /)
+#     ## Send the snapshot to the local linux as /${snap}
+#     parent=$(get_newest_snap ${LOCAL_LINUX_DIR})
+#     if milestone_present_p parent /; then
+# 	btrfs send -p $parent $snap | btrfs receive ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR}
+#     else
+# 	btrfs send $snap | btrfs receive ${LOCAL_LINUX_DIR}/${SNAPSHOT_DIR}
+#     fi
+#     ## Set this new local linux subvolume to be automatically mounted
+#     btrfs subvolume snapshot ${LOCAL_LINUX_DIR}/${snap} ${LOCAL_LINUX_DIR}/root
+#     set_btrfs_default_subvol_by_name ${LOCAL_LINUX_DIR} root
+#     ## Remount client_linux to reflect new default subvolume / root
+#     umount_client_linux
+#     mount_client_linux
+#     genfstab -U ${LOCAL_LINUX_DIR} > ${LOCAL_LINUX_DIR}/etc/fstab
+#     modify_local_linux
+#     configure_local_grub
+# }
 
-function modify_local_linux {
-    echo "FIXME: Do things to differentiate files on local linux from USB boot"
-    #/bin/cp -f /qcimage/linux_root/etc/local-fstab /mnt/etc/fstab
-    #/bin/cp -f /qcimage/linux_root/boot/grub2/local-grub.cfg /mnt/boot/grub2/grub.cfg
-    #cp /qcimage/linux_root/boot/grub2/altcmp.mod /mnt/boot/grub2
-}
+# function modify_local_linux {
+#     echo "FIXME: Do things to differentiate files on local linux from USB boot"
+#     #/bin/cp -f /qcimage/linux_root/etc/local-fstab /mnt/etc/fstab
+#     #/bin/cp -f /qcimage/linux_root/boot/grub2/local-grub.cfg /mnt/boot/grub2/grub.cfg
+#     #cp /qcimage/linux_root/boot/grub2/altcmp.mod /mnt/boot/grub2
+# }
 
-function configure_local_grub {
-    grub-install --target=i386-pc --debug --no-floppy --root-dir=${LOCAL_LINUX_DIR} ${INTERNAL_DISK}
-    arch-chroot ${LOCAL_LINUX_DIR} /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
-}
+# function configure_local_grub {
+#     grub-install --target=
+#     arch-chroot ${LOCAL_LINUX_DIR} /usr/bin/grub-mkconfig -o /boot/grub/grub.cfg
+#}
 
-function clone_new_machine {
-  # Restore MBR containing three paritions (reserved, windows, linux)
-  dd if=${RAW_IMAGE_DIR}/windows.mbr of=${INTERNAL_DISK}
-  # Rescan the MBR and create the new partition devices
-  partprobe
-  reload
-  echo Cloning Windows main partition to ${WINDOWS_PART}
-  ntfsclone $RAW_IMAGE_DIR/windows.ntfs.img -O ${WINDOWS_PART}
-  echo Transferring Linux to ${LOCAL_LINUX_PART}
-  transfer_linux_to_client
-}
+#function clone_new_machine {
+#  # Restore MBR containing three paritions (reserved, windows, linux)
+#  dd if=${RAW_IMAGE_DIR}/windows.mbr of=${INTERNAL_DISK}
+#  # Rescan the MBR and create the new partition devices
+#  partprobe
+#  reload
+#  echo Cloning Windows main partition to ${WINDOWS_PART}
+#  ntfsclone $RAW_IMAGE_DIR/windows.ntfs.img -O ${WINDOWS_PART}
+#  echo Transferring Linux to ${LOCAL_LINUX_PART}
+#  transfer_linux_to_client
+#}
 
 # function clone_admin_key {
 #     dest=$1
 #     if [ ! "${dest:0:5}"=="/dev/" ]; then
 # 	echo "clone_admin_key: Argument does not look like a device"
 #     elif [ ! "$QCIMAGE_MODE" == "admin" ]; then
-# 	echo "clone_admin_key: Not available in ${QCIMAGE} mode"
+# echo "clone_admin_key: Not available in ${QCIMAGE} mode"
 #     else
 # 	dd if=${ADMIN_DISK} of=$1 bs=512 count=1
 # 	partprobe
@@ -137,7 +137,8 @@ function find_ntfs_parts {
 }
 
 function find_linux_parts {
-    echo $(find_parts_by_parttype "0x83")
+    disk_dev=$1
+    echo $(find_parts_by_parttype "0fc63daf-8483-4772-8e79-3d69d8477de4" $disk_dev)
 }
 
 function find_parts_by_fstype {
@@ -148,6 +149,17 @@ function find_parts_by_fstype {
 
 function find_parts_by_parttype {
     parttype=$1
-    echo $(lsblk -l -f -o NAME,PARTTYPE |\
+    disk_dev=$2
+    echo $(lsblk -l -f -o NAME,PARTTYPE $disk_dev|\
 		  awk -vparttype="$parttype" 'index($2, parttype) {printf("/dev/%s\n", $1)}')
+}
+
+function make_local_linux_part {
+    sfdisk --dump $INTERNAL_DISK | gen_linux_part.awk | sfdisk -a $INTERNAL_DISK
+    partprobe
+    reload
+}
+
+function find_internal_efi {
+    find_parts_by_parttype "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" $INTERNAL_DISK
 }
