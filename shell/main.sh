@@ -11,13 +11,16 @@ for file in $(find /qcimage/shell -name \*.sh); do
 done
 
 function qcimage_reclone {
-    clone_new_machine
-    boot_windows
+    plymouth display-message --text "Recloning from image files"
+    sleep 60
+    #boot_windows
 }
 
 function qcimage_reset {
-    repo_reset
-    boot_windows
+    plymouth display-message --text "Reseting via git"
+    sleep 60
+    #repo_reset
+    #boot_windows
 }
 
 qcimage_settings_main
