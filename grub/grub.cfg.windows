@@ -2,7 +2,8 @@ menuentry 'windows' {
 	insmod part_gpt 
 	insmod fat
 	set root='hd0,gpt1'
-	search --no-floppy --fs-uuid --set=root x_INTERNAL_EFI_UUID
-	fi
+	search --no-floppy --fs-uuid --set=root x_EFI_UUID
 	chainloader /EFI/Microsoft/Boot/bootmgfw.efi
 }
+
+

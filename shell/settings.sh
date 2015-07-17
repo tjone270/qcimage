@@ -17,7 +17,8 @@ function qcimage_settings_main {
     LOCAL_LINUX_TEMPLATE=/images/internal_linux
     LOCAL_LINUX_PART=$(find_local_linux)
     LOCAL_LINUX_DIR=/client_linux
-    
+
+    ADMIN_DISK=$(find_admin_part|sed -e 's/[0-9]//g')
     ADMIN_LINUX_PART=$(find_admin_part)
     ADMIN_LINUX_DIR=/admin_linux
 
@@ -47,7 +48,7 @@ function qcimage_settings_main {
     PATH=$PATH:/qcimage/shell
     
     export QCIMAGE_MODE INTERNAL_DISK RAW_IMAGE_DIR REPO_DIR WINDOWS_DIR SNAPSHOT_DIR LOCAL_LINUX_TEMPLATE
-    export DISKS WINDOWS_PART LOCAL_LINUX_PART LOCAL_LINUX_DIR ADMIN_LINUX_PART ROOT_PART ADMIN_LINUX_DIR PATH
+    export DISKS WINDOWS_PART LOCAL_LINUX_PART LOCAL_LINUX_DIR ADMIN_LINUX_PART ROOT_PART ADMIN_LINUX_DIR ADMIN_DISK PATH
 }
 
 function find_internal_disk {

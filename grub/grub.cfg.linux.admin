@@ -1,4 +1,4 @@
-menuentry 'linux' {
+menuentry 'Step 0: Resize Windows, capture GPT/EFI/MSR' {
 	load_video
 	set gfxpayload=keep
 	insmod gzio
@@ -7,26 +7,12 @@ menuentry 'linux' {
 	set root='hd0,gpt1'
 	search --no-floppy --fs-uuid --set=root x_EFI_UUID
 	echo	'Loading QCImage linux ...'
-	linux	/vmlinuz-linux root=UUID=x_LINUX_UUID rw  quiet splash
+	linux	/vmlinuz-linux root=UUID=x_LINUX_UUID rw resize splash quiet
 	echo	'Loading initial ramdisk ...'
 	initrd	 /initramfs-linux.img
 }
 
-menuentry 'reclone' {
-	load_video
-	set gfxpayload=keep
-	insmod gzio
-	insmod part_gpt 
-	insmod fat
-	set root='hd0,gpt1'
-	search --no-floppy --fs-uuid --set=root x_EFI_UUID
-	echo	'Loading QCImage linux ...'
-	linux	/vmlinuz-linux root=UUID=x_LINUX_UUID rw reclone splash quiet
-	echo	'Loading initial ramdisk ...'
-	initrd	 /initramfs-linux.img
-}
-
-menuentry 'reset' {
+menuentry 'Step 1: Capture Windows' {
 	load_video
 	set gfxpayload=keep
 	insmod gzio
@@ -40,3 +26,37 @@ menuentry 'reset' {
 	initrd	 /initramfs-linux.img
 }
 
+menuentry 'Step 2: Clone from Image' {
+	load_video
+	set gfxpayload=keep
+	insmod gzio
+	insmod part_gpt 
+	insmod fat
+	set root='hd0,gpt1'
+	search --no-floppy --fs-uuid --set=root x_EFI_UUID
+	echo	'Loading QCImage linux ...'
+	linux	/vmlinuz-linux root=UUID=x_LINUX_UUID rw reset splash quiet
+	echo	'Loading initial ramdisk ...'
+	initrd	 /initramfs-linux.img
+}
+
+menuentry 'Step -32767: Hack the Gibson' {
+	load_video
+	set gfxpayload=keep
+	insmod gzio
+	insmod part_gpt 
+	insmod fat
+	set root='hd0,gpt1'
+	search --no-floppy --fs-uuid --set=root x_EFI_UUID
+	echo	'Loading QCImage linux ...'
+	linux	/vmlinuz-linux root=UUID=x_LINUX_UUID rw  quiet splash
+	echo	'Loading initial ramdisk ...'
+	initrd	 /initramfs-linux.img
+}
+
+menuentry 'Boot Internal Disk' {
+	insmod part_gpt 
+	insmod fat
+	set root='hd0,gpt1'
+	chainloader /EFI/Boot/bootx64.efi
+}

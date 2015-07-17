@@ -13,17 +13,3 @@ use_bg=true
 background_image /qcimage/resources/qcsre32.tga
 search -n -u -s windows x_WINDOWS_UUID
 search -n -u -s linux x_LINUX_UUID
-
-
-if [ ! -e ($windows)/ ]; then
-  # Can't find windows
-  default="reclone"
-else
-  if [ -e ($windows)/.qcimage/reset ]; then
-    default="reset"
-  elif [ -e ($windows)/.qcimage/reclone ]; then
-    default="reclone"
-  else
-    default="windows"
-  fi
-fi
