@@ -7,3 +7,6 @@ ExecStart=/qcimage/shell/main.sh reset
 RemainAfterExit=yes
 TimeoutSec=0
 Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
