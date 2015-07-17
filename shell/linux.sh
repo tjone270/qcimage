@@ -1,4 +1,7 @@
 function install_local_linux {
+    if [ ${LOCAL_LINUX_PART}x == "x" ]; then
+	make_local_linux_part
+    fi
     mkfs.btrfs -f $LOCAL_LINUX_PART
     tmpdir=$(mktemp -d)
     mount $LOCAL_LINUX_PART $tmpdir
@@ -6,9 +9,11 @@ function install_local_linux {
     umount ${tmpdir} && rm -r ${tmpdir}
     mount_client_linux
     install_qcimage
-    tar c $LOCAL_LINUX_TEMPLATE/*  |tar --strip-components 2 -C$LOCAL_LINUX_DIR -x
+    pacstrap -c -d ${LOCAL_LINUX_DIR} base git grub ntfs-3g efibootmgr
     mkdir ${LOCAL_LINUX_DIR}${RAW_IMAGE_DIR}
     cp -v ${RAW_IMAGE_DIR}/*img ${LOCAL_LINUX_DIR}${RAW_IMAGE_DIR}
+    cp -a ${REPO_DIR} ${LOCAL_LINUX_DIR}/${REPO_DIR}
+    ## FIXME - Link in mkinitcpio.*, fix_boot.sh
     arch-chroot $LOCAL_LINUX_DIR /root/fix_boot.sh
     grub_qcimage_cfg 2>/dev/null > $LOCAL_LINUX_DIR/boot/grub/grub.cfg
 }

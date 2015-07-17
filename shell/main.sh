@@ -22,7 +22,7 @@ function qcimage_reclone {
     if [ $QCIMAGE_MODE == "admin" ]; then
 	install_local_linux
     fi
-    boot_windows
+    #boot_windows
 }
 
 function qcimage_reset {
@@ -32,16 +32,17 @@ function qcimage_reset {
 }
 
 function qcimage_capture {
+    save_mbr
     save_efi
     save_msr
     repo_init
     save_windows
-    boot_windows
+    #boot_windows
 }
 
 function qcimage_resize {
-    resize_windows
-    boot_windows
+    resize_ntfs
+    #boot_windows
 }
 
 function boot_windows {

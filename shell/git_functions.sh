@@ -1,11 +1,11 @@
 ## Repo Functions
 
 function repo_init {
-    mount $WINDOWS_DIR
+    mount_windows
     cd $WINDOWS_DIR
     if [ -e .git ]; then
-	/bin/rm .git
-	/bin/rm -rf $REPO_DIR
+	/bin/rm -rf .git
+	/bin/rm -rf ${LOCAL_LINUX_TEMPLATE}$REPO_DIR
     fi
     git init .
     cp -u /qcimage/windows_root/.gitignore .

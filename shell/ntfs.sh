@@ -43,7 +43,7 @@ function save_windows {
       echo $part
       part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')
       image_file=$RAW_IMAGE_DIR/${part: -1}.ntfs.img
-      ntfsclone $part -o $image_file
+      ntfsclone $part -O $image_file
   done
 }
 

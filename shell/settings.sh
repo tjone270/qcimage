@@ -35,7 +35,7 @@ function qcimage_settings_main {
     #
     RAW_IMAGE_DIR=/images
     
-    #REPO_DIR=/repo
+    REPO_DIR=/repo
     
     #SNAPSHOT_DIR=/snapshots
     
