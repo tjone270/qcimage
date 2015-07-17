@@ -1,10 +1,7 @@
 # QCImage Logic
 insmod btrfs
 search --no-floppy --fs-uuid --set=root x_LINUX_UUID
-loadfont /qcimage/resources/unicode.pf2
-insmod vbe
 insmod gfxterm
-insmod png
 insmod tga
 set gfxmode=640x480x32
 set gfxpayload=keep
@@ -27,3 +24,5 @@ else
     default="windows"
   fi
 fi
+
+set timeout=5

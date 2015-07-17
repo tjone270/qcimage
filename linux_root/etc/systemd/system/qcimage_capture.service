@@ -1,0 +1,12 @@
+[Unit]
+Description=Capture Windows/EFI/MSR
+ConditionKernelCommandLine=capture
+
+[Service]
+ExecStart=/qcimage/shell/main.sh capture
+RemainAfterExit=yes
+TimeoutSec=0
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

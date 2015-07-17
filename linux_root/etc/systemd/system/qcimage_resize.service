@@ -1,0 +1,12 @@
+[Unit]
+Description=Resize windows install
+ConditionKernelCommandLine=resize
+
+[Service]
+ExecStart=/qcimage/shell/main.sh resize
+RemainAfterExit=yes
+TimeoutSec=0
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

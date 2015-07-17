@@ -9,10 +9,11 @@ function repo_init {
     fi
     git init .
     cp -u /qcimage/windows_root/.gitignore .
-    mv .git $REPO_DIR
-    echo "gitdir: $REPO_DIR" > .git
+    mv .git ${LOCAL_LINUX_TEMPLATE}$REPO_DIR
+    echo "gitdir: ${LOCAL_LINUX_TEMPLATE}$REPO_DIR" > .git
     git add .
     git commit -m "Initial import"
+    echo "gitdir: $REPO_DIR" > .git
 }
 
 function repo_update {
@@ -22,13 +23,15 @@ function repo_update {
 }
 
 function repo_reset {
-    #plymouth message --text="Resetting Repository"
     cd $WINDOWS_DIR
+    plymouth display-message --text="Copying out the demos"
     sync_demos
     if [ -e $WINDOWS_DIR/.qcimage/reset ]; then
 	rm $WINDOWS_DIR/.qcimage/reset
     fi
+    plymouth display-message --text="Resetting to HEAD"
     git reset --hard
+    plymouth display-message --text="Removing untracked files"
     git clean -f
     /bin/rm -rf $WINDOWS_DIR/.qcimage
     mkdir $WINDOWS_DIR/.qcimage
@@ -58,9 +61,9 @@ function reload {
    . /etc/profile.d/qcimage.sh
 }
 
-function boot_windows {
-   grub2-reboot "Windows"
-   reboot
-   echo "Ready to reboot!"
-}
+#function boot_windows {
+#   grub2-reboot "Windows"
+#   reboot
+#   echo "Ready to reboot!"
+#}
 

@@ -6,7 +6,9 @@ function install_local_linux {
     umount ${tmpdir} && rm -r ${tmpdir}
     mount_client_linux
     install_qcimage
-    cp -an ${LOCAL_LINUX_TEMPLATE}/* $LOCAL_LINUX_DIR
+    tar c $LOCAL_LINUX_TEMPLATE/*  |tar --strip-components 2 -C$LOCAL_LINUX_DIR -x
+    mkdir ${LOCAL_LINUX_DIR}${RAW_IMAGE_DIR}
+    cp -v ${RAW_IMAGE_DIR}/*img ${LOCAL_LINUX_DIR}${RAW_IMAGE_DIR}
     arch-chroot $LOCAL_LINUX_DIR /root/fix_boot.sh
     grub_qcimage_cfg 2>/dev/null > $LOCAL_LINUX_DIR/boot/grub/grub.cfg
 }

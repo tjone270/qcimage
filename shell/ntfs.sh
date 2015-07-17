@@ -28,25 +28,32 @@ function restore_msr {
     dd if=/images/msr.img of=$(find_msr) bs=8M
 }
 
+function save_efi {
+    dd if=$(find_internal_efi) of=/images/efi.img bs=8M
+}
+
+function restore_efi {
+    dd if=/images/efi.img of=$(find_internal_efi) bs=8M
+}
+
 function save_windows {
   # This function makes new windows clone images
-  save_mbr
   remove_windows_cruft
-  save_msr
   for part in $(find_ntfs_parts|grep $INTERNAL_DISK); do
       echo $part
       part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')
       image_file=$RAW_IMAGE_DIR/${part: -1}.ntfs.img
-      if [ ! -e $image_file ]; then
-	  echo "save_windows: No previous $image_file, creating new one"
-	  ntfsclone $part -o $image_file
-      else
-	  echo "save_windows: Updating existing $image_file image"
-	  # So, if we unlink the file, btrfs cannot track the
-	  # changes... so we jump through a hoop to only change the needed blocks
-	  compare_image_update_in_place ${part} ${image_file}
-      fi
+      ntfsclone $part -o $image_file
   done
+}
+
+function restore_windows {
+    for part in $(find_ntfs_parts|grep $INTERNAL_DISK); do
+	echo $part
+	part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')
+	image_file=$RAW_IMAGE_DIR/${part: -1}.ntfs.img
+	ntfsclone -O $part $image_file
+    done
 }
 
 function get_ntfs_cluster_size {

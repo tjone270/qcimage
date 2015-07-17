@@ -11,16 +11,50 @@ for file in $(find /qcimage/shell -name \*.sh); do
 done
 
 function qcimage_reclone {
-    plymouth display-message --text "Recloning from image files"
-    sleep 60
-    #boot_windows
+    plymouth display-message --text "Restoring GPT"
+    restore_mbr
+    plymouth display-message --text "Restoring EFI Partition"
+    restore_efi
+    plymouth display-message --text "Restoring MSR"
+    restore_msr
+    plymouth display-message --text "Restoring NTFS Partitions"
+    restore_windows
+    if [ $QCIMAGE_MODE == "admin" ]; then
+	install_local_linux
+    fi
+    boot_windows
 }
 
 function qcimage_reset {
-    plymouth display-message --text "Reseting via git"
-    sleep 60
-    #repo_reset
-    #boot_windows
+    plymouth display-message --text "Reseting Machine"
+    repo_reset
+    boot_windows
+}
+
+function qcimage_capture {
+    save_efi
+    save_msr
+    repo_init
+    save_windows
+    boot_windows
+}
+
+function qcimage_resize {
+    resize_windows
+    boot_windows
+}
+
+function boot_windows {
+    plymouth display-message --text "Reseting Machine"
+    if [ $QCIMAGE_MODE == "admin" ]; then
+	grub-reboot 4
+	mount_client_linux
+	grub-reboot --boot-directory=/client_linux/boot "windows"
+	reboot
+    else
+	grub-reboot "windows"
+	reboot
+    fi
 }
 
 qcimage_settings_main
