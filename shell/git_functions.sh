@@ -3,17 +3,14 @@
 function repo_init {
     mount_windows
     cd $WINDOWS_DIR
-    if [ -e .git ]; then
-	/bin/rm -rf .git
-	/bin/rm -rf ${LOCAL_LINUX_TEMPLATE}$REPO_DIR
-    fi
+    /bin/rm -rf .git
+    /bin/rm -rf $REPO_DIR
     git init .
     cp -u /qcimage/windows_root/.gitignore .
-    mv .git ${LOCAL_LINUX_TEMPLATE}$REPO_DIR
-    echo "gitdir: ${LOCAL_LINUX_TEMPLATE}$REPO_DIR" > .git
+    mv .git $REPO_DIR
+    echo "gitdir: $REPO_DIR" > .git
     git add .
     git commit -m "Initial import"
-    echo "gitdir: $REPO_DIR" > .git
 }
 
 function repo_update {

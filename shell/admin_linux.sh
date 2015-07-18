@@ -15,8 +15,7 @@
 
 function mount_client_linux {
     echo "Trying to mount internal linux"
-    mount ${LOCAL_LINUX_PART} ${LOCAL_LINUX_DIR}
-    mount $(find_internal_efi) ${LOCAL_LINUX_DIR}/boot
+    mount ${LOCAL_LINUX_PART} ${LOCAL_LINUX_DIR} && mount $(find_internal_efi) ${LOCAL_LINUX_DIR}/boot
 }
 
 function umount_client_linux {

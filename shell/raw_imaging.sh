@@ -5,6 +5,7 @@ function save_mbr {
 function restore_mbr {
     sfdisk $INTERNAL_DISK < /images/gpt.desc
     partprobe
+    reload
 }
 
 # function transfer_linux_to_client {

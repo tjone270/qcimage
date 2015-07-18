@@ -14,7 +14,7 @@ function qcimage_settings_main {
     WINDOWS_DIR=/windows
     WINDOWS_SHIT=( pagefile.sys hiberfile.sys )
 
-    LOCAL_LINUX_TEMPLATE=/images/internal_linux
+    LOCAL_LINUX_TEMPLATE=/images/internal_linux.tgz
     LOCAL_LINUX_PART=$(find_local_linux)
     LOCAL_LINUX_DIR=/client_linux
 
@@ -52,19 +52,7 @@ function qcimage_settings_main {
 }
 
 function find_internal_disk {
-    # Find the first enumerated disk that has an ntfs partition with a
-    # "/Windows" folder
-    for disk in $DISKS; do
-	disk_dev=/dev/$disk
-	for part in $(find_ntfs_parts |grep $disk_dev); do
-	    tmpdir=$(mktemp -d)
-	    mount $part $tmpdir
-	    if [ -e ${tmpdir}/Windows ]; then
-		echo ${disk_dev}
-	    fi
-	    umount ${tmpdir} && rm -r ${tmpdir}
-	done
-    done
+    find_parts_by_parttype ebd0a0a2-b9e5-4433-87c0-68b6b72699c7|sed -e 's/[0-9]//'
 }
 
 function find_admin_part {
@@ -86,6 +74,10 @@ function find_windows_part {
     for part in $(find_ntfs_parts |grep $disk_dev); do
 	tmpdir=$(mktemp -d)
 	mount $part $tmpdir
+	if ! $?; then
+	    echo $part
+	    break
+	fi
 	if [ -e ${tmpdir}/Windows ]; then
 	    umount ${tmpdir} && rm -r ${tmpdir}
 	    echo ${part}
