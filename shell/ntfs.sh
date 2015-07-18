@@ -3,7 +3,7 @@ function mount_windows {
 }
 
 function umount_windows {
-    umount $WINDOWS_DIR
+    umount $WINDOWS_PART
 }
 
 function remove_windows_cruft {

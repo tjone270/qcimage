@@ -52,6 +52,7 @@ function qcimage_settings_main {
 }
 
 function find_internal_disk {
+    # We assume that only a windows system disk would have an MSR
     find_parts_by_parttype ebd0a0a2-b9e5-4433-87c0-68b6b72699c7|sed -e 's/[0-9]//'
 }
 
@@ -73,10 +74,13 @@ function find_windows_part {
     fi
     for part in $(find_ntfs_parts |grep $disk_dev); do
 	tmpdir=$(mktemp -d)
-	mount $part $tmpdir
-	if ! $?; then
+	# Try to mount to check for /Windows directory, on failure
+	# assume first NTFS partition. Failure usually due to being
+	# already mounted
+	
+	if ! mount $part $tmpdir; then
 	    echo $part
-	    break
+	    return 0
 	fi
 	if [ -e ${tmpdir}/Windows ]; then
 	    umount ${tmpdir} && rm -r ${tmpdir}

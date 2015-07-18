@@ -28,7 +28,7 @@ function qcimage_reclone {
 function qcimage_reset {
     plymouth display-message --text "Reseting Machine"
     repo_reset
-    boot_windows
+    #boot_windows
 }
 
 function qcimage_capture {

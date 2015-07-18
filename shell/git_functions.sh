@@ -11,6 +11,7 @@ function repo_init {
     echo "gitdir: $REPO_DIR" > .git
     git add .
     git commit -m "Initial import"
+    umount_windows
 }
 
 function repo_update {

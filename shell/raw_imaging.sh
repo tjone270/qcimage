@@ -157,7 +157,7 @@ function find_parts_by_parttype {
 }
 
 function make_local_linux_part {
-    sfdisk --dump $INTERNAL_DISK | gen_linux_part.awk | sfdisk -a $INTERNAL_DISK
+    sfdisk --dump $INTERNAL_DISK | gen_linux_part.awk | sfdisk --no-reread flag -a $INTERNAL_DISK
     partprobe
     reload
 }
