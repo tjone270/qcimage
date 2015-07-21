@@ -81,7 +81,48 @@ function install_qcimage {
     ln $qclinroot/etc/mkinitcpio.conf ${tmpdir}/etc
     ln $qclinroot/etc/mkinitcpio.d/qcimage.preset ${tmpdir}/etc/mkinitcpio.d
     ln $qclinroot/root/fix_boot.sh ${tmpdir}/root/fix_boot.sh
+    cp $qclinroot/etc/netctl/wired ${tmpdir}/etc/netctl
+    cp $qclinroot/etc/netctl/interfaces/en-any ${tmpdir}/etc/netctl/interfaces
     systemctl --root $tmpdir enable qcimage_reset
     systemctl --root $tmpdir enable qcimage_reclone
+    systemctl --root $tmpdir enable netctl@wired
 }
     
+function install_admin_linux {
+    usb_disk=$1
+    efi_part=${usb_disk}1
+    root_part=${usb_disk}2
+    if [ "${usb_disk}x" == "x" ]; then
+	echo "Provide storage device path as first arguement"
+	return
+    fi
+    if [ "$usb_disk" == "$INTERNAL_DISK" ]; then
+	echo "Refusing to clobber internal disk"
+	return
+    fi
+    if [ "$usb_disk" == "$ADMIN_DISK" ]; then
+	echo "Refusing to clobber admin disk"
+	return
+    fi
+    cat /qcimage/resources/admin_usb_gpt.desc | sfdisk $usb_disk
+    partprobe
+    mkfs.vfat -F32 $efi_part
+    mkfs.btrfs -f $root_part
+    tmp_root_mnt=$(mktemp -d)
+    mount $root_part $tmp_root_mnt
+    fstrim $tmp_root_mnt
+    mkdir $tmp_root_mnt/boot
+    tmp_snap=/rootsnap
+    mount $efi_part $tmp_root_mnt/boot
+    btrfs subvolume snapshot / $tmp_snap
+    tar -C $tmp_snap --exclude=./images/* --exclude=./repo/* -c . | tar -C $tmp_root_mnt -x -v 
+    cp -r /boot/{initramfs-linux-fallback.img,initramfs-linux.img,vmlinuz-linux} $tmp_root_mnt/boot
+    cp $tmp_root_mnt/qcimage/linux_root/root/fix_boot.sh $tmp_root_mnt/root
+    arch-chroot $tmp_root_mnt /root/fix_boot.sh
+    grub_qcimage_cfg_admin > $tmp_root_mnt/boot/grub/grub.cfg
+    mkdir -p $tmp_root_mnt/boot/EFI/boot
+    cp $tmp_root_mnt/boot/EFI/grub/grubx64.efi $tmp_root_mnt/boot/EFI/boot/bootx64.efi
+    umount $tmp_root_mnt/boot
+    umount $tmp_root_mnt
+    btrfs subvolume delete $tmp_snap
+}

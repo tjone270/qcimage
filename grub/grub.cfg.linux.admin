@@ -57,6 +57,6 @@ menuentry 'Step -32767: Hack the Gibson' {
 menuentry 'Boot Internal Disk' {
 	insmod part_gpt 
 	insmod fat
-	set root='hd0,gpt1'
+	set root='hd1,gpt1'
 	chainloader /EFI/Boot/bootx64.efi
 }

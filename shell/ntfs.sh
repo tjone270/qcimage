@@ -48,12 +48,10 @@ function save_windows {
 }
 
 function restore_windows {
-    for part in $(find_ntfs_parts|grep $INTERNAL_DISK); do
-	echo $part
-	part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')
-	image_file=$RAW_IMAGE_DIR/${part: -1}.ntfs.img
-	ntfsclone -O $part $image_file
-    done
+    part=$(find_windows_part)
+    part_num=$(expr match "$part" '[a-z]*\([0-9]*\)')
+    image_file=$RAW_IMAGE_DIR/${part: -1}.ntfs.img
+    ntfsclone -O $part $image_file
 }
 
 function get_ntfs_cluster_size {

@@ -170,3 +170,6 @@ function find_admin_efi {
     find_parts_by_parttype "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" $ADMIN_DISK
 }
 
+function find_windows_part {
+    find_parts_by_parttype "ebd0a0a2-b9e5-4433-87c0-68b6b72699c7" $INTERNAL_DISK
+}

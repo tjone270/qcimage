@@ -10,4 +10,4 @@ background_image /qcimage/resources/qcsre32.tga
 search -n -u -s windows x_WINDOWS_UUID
 search -n -u -s linux x_LINUX_UUID
 
-set timeout=5
+set timeout=-1

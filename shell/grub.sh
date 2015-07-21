@@ -13,9 +13,16 @@ function grub_qcimage_cfg {
 }
 
 function grub_qcimage_cfg_admin {
-    efi_part=$(find_admin_efi)
-    efi_uuid=$(uuid_from_part $efi_part)
-    linux_uuid=$(uuid_from_part $ADMIN_LINUX_PART)
+    disk=$1
+    if [ "${disk}x" == "x" ]; then
+	efi_part=$(find_admin_efi)
+	efi_uuid=$(uuid_from_part $efi_part)
+	linux_uuid=$(uuid_from_part $ADMIN_LINUX_PART)
+    else
+	efi_part=${disk}1
+	efi_uuid=$(uuid_from_part $efi_part)
+	linux_uuid=$(uuid_from_part ${disk}2)
+    fi		
     (cd /qcimage/grub
      sed -e "s,x_EFI_UUID,${efi_uuid},g" -e "s,x_LINUX_UUID,${linux_uuid},g" grub.cfg.header
      sed -e "s,x_EFI_UUID,${efi_uuid},g" -e "s,x_LINUX_UUID,${linux_uuid},g" grub.cfg.linux.admin

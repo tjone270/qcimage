@@ -40,15 +40,19 @@ function qcimage_settings_main {
     #SNAPSHOT_DIR=/snapshots
     
     # Rsync info for demo backup
-    DEMOS_USER=
-    DEMOS_KEY=
-    DEMOS_SERVER=
-    DEMOS_PATH=
+    DEMOS_USER=demos_bak
+    DEMOS_KEY=/qcimage/resources/demos_rsa
+    DEMOS_SERVER=qctdu.at.quakecon.org
+    DEMOS_PATH=$(get_mac_addr)/
 
     PATH=$PATH:/qcimage/shell
     
     export QCIMAGE_MODE INTERNAL_DISK RAW_IMAGE_DIR REPO_DIR WINDOWS_DIR SNAPSHOT_DIR LOCAL_LINUX_TEMPLATE
     export DISKS WINDOWS_PART LOCAL_LINUX_PART LOCAL_LINUX_DIR ADMIN_LINUX_PART ROOT_PART ADMIN_LINUX_DIR ADMIN_DISK PATH
+}
+
+function get_mac_addr {
+    ip link | awk '/link\/ether/ {print $2}' |head -n1
 }
 
 function find_internal_disk {
@@ -67,29 +71,32 @@ function find_admin_part {
     done
 }
 
-function find_windows_part {
-    disk_dev=$INTERNAL_DISK
-    if [ -n "$disk_dev" ]; then
-	disk_dev=$(find_internal_disk)
-    fi
-    for part in $(find_ntfs_parts |grep $disk_dev); do
-	tmpdir=$(mktemp -d)
-	# Try to mount to check for /Windows directory, on failure
-	# assume first NTFS partition. Failure usually due to being
-	# already mounted
+# function find_windows_part {
+#     disk_dev=$INTERNAL_DISK
+#     if [ -n "$disk_dev" ]; then
+# 	disk_dev=$(find_internal_disk)
+#     fi
+#     for part in $(find_ntfs_parts |grep $disk_dev); do
+# 	tmpdir=$(mktemp -d)
+# 	# Try to mount to check for /Windows directory, on failure
+# 	# assume first NTFS partition. Failure usually due to being
+# 	# already mounted
 	
-	if ! mount $part $tmpdir; then
-	    echo $part
-	    return 0
-	fi
-	if [ -e ${tmpdir}/Windows ]; then
-	    umount ${tmpdir} && rm -r ${tmpdir}
-	    echo ${part}
-	    return 0
-	fi
-	umount ${tmpdir} && rm -r ${tmpdir}
-    done
-}
+# 	if ! mount $part $tmpdir; then
+# 	    #echo $part
+#             #return
+# 	    echo "nigga please"
+# 	fi
+# 	for name in WINDOWS Windows windows; do
+# 	    if [ -e ${tmpdir}/$name ]; then
+# 		umount ${tmpdir} && rm -r ${tmpdir}
+# 		echo ${part}
+# 		return 0
+# 	    fi
+# 	done
+# 	umount ${tmpdir} && rm -r ${tmpdir}
+#     done
+# }
 
 function find_local_linux {
     disk_dev=$INTERNAL_DISK
