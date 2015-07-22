@@ -11,3 +11,4 @@ search -n -u -s windows x_WINDOWS_UUID
 search -n -u -s linux x_LINUX_UUID
 
 set timeout=-1
+default=2
