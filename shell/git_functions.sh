@@ -2,22 +2,23 @@
 
 function repo_init {
     mount_windows
-    cd $WINDOWS_DIR
-    /bin/rm -rf .git
-    /bin/rm -rf $REPO_DIR
-    git init .
-    cp -u /qcimage/windows_root/.gitignore .
-    mv .git $REPO_DIR
-    echo "gitdir: $REPO_DIR" > .git
-    git add .
-    git commit -m "Initial import"
+    (cd $WINDOWS_DIR
+     /bin/rm -rf .git
+     /bin/rm -rf $REPO_DIR
+     git init .
+     cp -u /qcimage/windows_root/.gitignore .
+     mv .git $REPO_DIR
+     echo "gitdir: $REPO_DIR" > .git
+     git add .
+     git commit -m "Initial import" )
     umount_windows
 }
 
 function repo_update {
-    cd $WINDOWS_DIR
-    git add .
-    git commit -m"update"
+    (cd $WINDOWS_DIR
+     git add .
+     git commit -m"update"
+    )
 }
 
 function repo_reset {
