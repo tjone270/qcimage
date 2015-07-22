@@ -32,7 +32,6 @@ function install_local_linux {
     fi
     echo "Transferring rootfs"
     tar -C ${LOCAL_LINUX_DIR} -x -f $LOCAL_LINUX_TEMPLATE
-    genfstab -U ${LOCAL_LINUX_DIR} ${LOCAL_LINUX_DIR}/etc/fstab
     #echo "Copying Image Files"
     #copy_images
     echo "Transferring repo"
@@ -87,17 +86,16 @@ function install_qcimage {
     fi
     cp -r /qcimage ${tmpdir}
     qclinroot=${tmpdir}/qcimage/linux_root
-    ln $qclinroot/etc/profile.d/qcimage.sh ${tmpdir}/etc/profile.d/qcimage.sh
-    ln $qclinroot/etc/systemd/system/* ${tmpdir}/etc/systemd/system
+    cp $qclinroot/etc/profile.d/qcimage.sh ${tmpdir}/etc/profile.d/qcimage.sh
+    cp $qclinroot/etc/systemd/system/* ${tmpdir}/etc/systemd/system
     rm ${tmpdir}/etc/mkinitcpio.conf
-    ln $qclinroot/etc/mkinitcpio.conf ${tmpdir}/etc
-    ln $qclinroot/etc/mkinitcpio.d/qcimage.preset ${tmpdir}/etc/mkinitcpio.d
-    ln $qclinroot/root/fix_boot.sh ${tmpdir}/root/fix_boot.sh
+    cp $qclinroot/etc/mkinitcpio.conf ${tmpdir}/etc
+    cp $qclinroot/etc/mkinitcpio.d/qcimage.preset ${tmpdir}/etc/mkinitcpio.d
+    cp $qclinroot/root/fix_boot.sh ${tmpdir}/root/fix_boot.sh
     cp $qclinroot/etc/netctl/wired ${tmpdir}/etc/netctl
     cp $qclinroot/etc/netctl/interfaces/en-any ${tmpdir}/etc/netctl/interfaces
     systemctl --root $tmpdir enable qcimage_reset
-    systemctl --root $tmpdir enable qcimage_reclone
-    systemctl --root $tmpdir enable netctl@wired
+    arch-chroot $tmpdir /usr/bin/netctl enable wired
 }
     
 function install_admin_linux {
@@ -129,6 +127,7 @@ function install_admin_linux {
     btrfs subvolume snapshot / $tmp_snap
     tar -C $tmp_snap --exclude=./images/* --exclude=./repo/* -c . | tar -C $tmp_root_mnt -x -v 
     cp -r /boot/{initramfs-linux-fallback.img,initramfs-linux.img,vmlinuz-linux} $tmp_root_mnt/boot
+    genfstab -U ${tmp_root_mnt} > ${tmp_root_mnt}/etc/fstab
     cp $tmp_root_mnt/qcimage/linux_root/root/fix_boot.sh $tmp_root_mnt/root
     arch-chroot $tmp_root_mnt /root/fix_boot.sh
     grub_qcimage_cfg_admin $usb_disk > $tmp_root_mnt/boot/grub/grub.cfg
