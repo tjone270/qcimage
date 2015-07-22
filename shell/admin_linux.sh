@@ -15,6 +15,10 @@
 
 function mount_client_linux {
     echo "Trying to mount internal linux"
+    if [ "$LOCAL_LINUX_PART" == "$ROOT_PART" ]; then
+	echo "Refusing to mount admin root on client mountpoint"
+	return 1
+    fi
     mount ${LOCAL_LINUX_PART} ${LOCAL_LINUX_DIR} && mount $(find_internal_efi) ${LOCAL_LINUX_DIR}/boot
 }
 
