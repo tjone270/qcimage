@@ -130,7 +130,7 @@ function install_admin_linux {
     cp -r /boot/{initramfs-linux-fallback.img,initramfs-linux.img,vmlinuz-linux} $tmp_root_mnt/boot
     cp $tmp_root_mnt/qcimage/linux_root/root/fix_boot.sh $tmp_root_mnt/root
     arch-chroot $tmp_root_mnt /root/fix_boot.sh
-    grub_qcimage_cfg_admin > $tmp_root_mnt/boot/grub/grub.cfg
+    grub_qcimage_cfg_admin $usb_disk > $tmp_root_mnt/boot/grub/grub.cfg
     mkdir -p $tmp_root_mnt/boot/EFI/boot
     cp $tmp_root_mnt/boot/EFI/grub/grubx64.efi $tmp_root_mnt/boot/EFI/boot/bootx64.efi
     umount $tmp_root_mnt/boot
