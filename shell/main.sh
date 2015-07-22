@@ -22,27 +22,32 @@ function qcimage_reclone {
     if [ $QCIMAGE_MODE == "admin" ]; then
 	install_local_linux
     fi
-    #boot_windows
+    boot_windows
 }
 
 function qcimage_reset {
     plymouth display-message --text "Reseting Machine"
     repo_reset
-    #boot_windows
+    boot_windows
 }
 
 function qcimage_capture {
+    plymouth display-message --text "Saving GPT"
     save_mbr
+    plymouth display-message --text "Saving EFI"
     save_efi
+    plymouth display-message --text "Saving MSR"
     save_msr
+    plymouth display-message --text "Initializing Local Repo"
     repo_init
+    plymouth display-message --text "Cloning NTFS"
     save_windows
-    #boot_windows
+    boot_windows
 }
 
 function qcimage_resize {
     resize_ntfs
-    #boot_windows
+    boot_windows
 }
 
 function boot_windows {

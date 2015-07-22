@@ -32,6 +32,7 @@ function install_local_linux {
     fi
     echo "Transferring rootfs"
     tar -C ${LOCAL_LINUX_DIR} -x -f $LOCAL_LINUX_TEMPLATE
+    genfstab -U ${LOCAL_LINUX_DIR} ${LOCAL_LINUX_DIR}/etc/fstab
     #echo "Copying Image Files"
     #copy_images
     echo "Transferring repo"
