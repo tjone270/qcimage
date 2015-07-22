@@ -2,7 +2,17 @@ function install_local_linux {
     umount_client_linux
     # Create a linux part using remaining space
     if [ ${LOCAL_LINUX_PART}x == "x" ]; then
-	make_local_linux_part
+	if make_local_linux_part; then
+	    while [ ${INTERNAL_DISK}x == "x" ]; do
+		INTERNAL_DISK=$(find_internal_disk)
+	    done
+	    while [ ${LOCAL_LINUX_PART}x == "x" ]; do
+		LOCAL_LINUX_PART=$(find_local_linux)
+	    done
+	else
+	    echo "Failed to create local linux part"
+	    return 1
+	fi
     fi
     # Format part
     mkfs.btrfs -f $LOCAL_LINUX_PART
@@ -32,6 +42,7 @@ function install_local_linux {
     fi
     arch-chroot $LOCAL_LINUX_DIR /root/fix_boot.sh
     grub_qcimage_cfg 2>/dev/null > $LOCAL_LINUX_DIR/boot/grub/grub.cfg
+    umount_client_linux
 }
 
 function copy_images {
