@@ -26,6 +26,8 @@ function qcimage_reclone {
 }
 
 function qcimage_reset {
+    plymouth display-message --text="Copying out the demos"
+    backup_demos
     plymouth display-message --text "Reseting Machine"
     repo_reset
     boot_windows
